@@ -16,7 +16,6 @@ function initPositionBuffer(gl) {
   const positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-  // 3D positions for quad (z=0)
   const positions = [
     1.0, 1.0, 0.0,
     -1.0, 1.0, 0.0,
@@ -32,7 +31,6 @@ function initNormalBuffer(gl) {
   const normalBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
 
-  // All normals point toward camera (0, 0, 1)
   const normals = [
     0.0, 0.0, 1.0,
     0.0, 0.0, 1.0,
@@ -48,7 +46,6 @@ function initTexCoordBuffer(gl) {
   const texCoordBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
 
-  // UV coordinates for quad corners
   const texCoords = [
     1.0, 1.0,
     0.0, 1.0,
@@ -64,7 +61,6 @@ function initColorBuffer(gl) {
   const colorBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 
-  // RGBW colors for quad corners (Red, Green, Blue, White)
   const colors = [
     1.0, 0.0, 0.0, 1.0,  // Red (top-right)
     0.0, 1.0, 0.0, 1.0,  // Green (top-left)
