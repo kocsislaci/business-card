@@ -1,6 +1,6 @@
 import { initBuffers } from './init-buffers.js';
 import { drawScene } from './draw-scene.js';
-import { CursorController } from './cursor-controller.js';
+import { CursorController, handShakeEffect } from './cursor-controller.js';
 
 const cursorLerpConfig = {
   strategy: 'lerp',
@@ -17,6 +17,22 @@ const cursorEasingConfig = {
   easing: { duration: 0.3, easing: 'easeOutCubic' }
 };
 const cursorController = new CursorController(cursorLerpConfig);
+
+// Add hand-shake effect to cursor (active when moving)
+cursorController.addEffect(handShakeEffect, {
+  intensity: 0.0002,
+  frequency: 8.0,
+  velocityScale: 0.5,
+  minVelocity: 0.05
+});
+
+// Add idle hand effect (active when stationary)
+cursorController.addEffect(idleHandEffect, {
+  intensity: 0.002,
+  frequency: 0.2,
+  maxVelocity: 0.0001,
+  pattern: 'organic'
+});
 
 main();
 
