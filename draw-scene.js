@@ -1,4 +1,4 @@
-function drawScene(gl, programInfo, buffers, texture, mouseState) {
+function drawScene(gl, programInfo, buffers, texture, cursorState) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clearDepth(1.0);
     gl.enable(gl.DEPTH_TEST);
@@ -49,10 +49,10 @@ function drawScene(gl, programInfo, buffers, texture, mouseState) {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.uniform1i(programInfo.uniformLocations.texture, 0);
 
-    // Compute light direction from mouse position
+    // Compute light direction from cursor position
     const fov = 45 * Math.PI / 180;
-    const dirX = mouseState.x * aspect * Math.tan(fov / 2);
-    const dirY = mouseState.y * Math.tan(fov / 2);
+    const dirX = cursorState.x * aspect * Math.tan(fov / 2);
+    const dirY = cursorState.y * Math.tan(fov / 2);
     const dirZ = -1.0;
     const length = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
     const lightDir = [dirX / length, dirY / length, dirZ / length];

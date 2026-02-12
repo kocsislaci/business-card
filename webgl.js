@@ -1,14 +1,27 @@
 import { initBuffers } from './init-buffers.js';
 import { drawScene } from './draw-scene.js';
+import { CursorController } from './cursor-controller.js';
 
-const mouseState = { x: 0.0, y: 0.0 };
+const cursorLerpConfig = {
+  strategy: 'lerp',
+  lerp: { damping: 10.0 }
+}
+
+const cursorSpringConfig = {
+  strategy: 'spring',
+  spring: { stiffness: 150, damping: 10 }
+};
+
+const cursorEasingConfig = {
+  strategy: 'easing',
+  easing: { duration: 0.3, easing: 'easeOutCubic' }
+};
+const cursorController = new CursorController(cursorLerpConfig);
 
 main();
 
-async function main() {
-    const canvas = document.querySelector("#canvas");
-    const gl = canvas.getContext("webgl");
-  
+async function main() {    
+    const gl = document.querySelector("#canvas").getContext("webgl");
     if (gl === null) {
       alert(
         "Unable to initialize WebGL. Your browser or machine may not support it.",
@@ -16,11 +29,11 @@ async function main() {
       return;
     }
 
-    // Mouse tracking
-    canvas.addEventListener('mousemove', (event) => {
-        const rect = canvas.getBoundingClientRect();
-        mouseState.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        mouseState.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
+    // Mouse tracking across entire viewport
+    window.addEventListener('mousemove', (event) => {
+        const x = (event.clientX / window.innerWidth) * 2 - 1;
+        const y = -((event.clientY / window.innerHeight) * 2 - 1);
+        cursorController.setTarget(x, y);
     });
 
     const vertexShaderSource = await loadShaderFile('./vertex.glsl');
@@ -49,11 +62,20 @@ async function main() {
     const buffers = initBuffers(gl);
     const texture = loadTexture(gl);
 
-    function render() {
-        drawScene(gl, programInfo, buffers, texture, mouseState);
+    let lastTime = 0;
+    function render(currentTime) {
+        // Calculate deltaTime in seconds
+        const deltaTime = lastTime === 0 ? 0 : (currentTime - lastTime) / 1000;
+        lastTime = currentTime;
+
+        // Update cursor position with smoothing
+        cursorController.update(deltaTime);
+        const cursorState = cursorController.getPosition();
+
+        drawScene(gl, programInfo, buffers, texture, cursorState);
         requestAnimationFrame(render);
     }
-    render();
+    requestAnimationFrame(render);
 }
 
 function loadTexture(gl) {
