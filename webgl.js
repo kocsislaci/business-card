@@ -1,12 +1,11 @@
 import { initBuffers } from './init-buffers.js';
 import { drawScene } from './draw-scene.js';
-import { CursorController, handShakeEffect } from './cursor-controller.js';
+import { CursorController, handShakeEffect, idleHandEffect } from './cursor-controller.js';
 
 const cursorLerpConfig = {
   strategy: 'lerp',
   lerp: { damping: 10.0 }
 }
-
 const cursorSpringConfig = {
   strategy: 'spring',
   spring: { stiffness: 150, damping: 10 }
@@ -46,7 +45,7 @@ async function main() {
     }
 
     // Mouse tracking across entire viewport
-    window.addEventListener('mousemove', (event) => {
+    window.addEventListener('pointermove', (event) => {
         const x = (event.clientX / window.innerWidth) * 2 - 1;
         const y = -((event.clientY / window.innerHeight) * 2 - 1);
         cursorController.setTarget(x, y);
@@ -93,6 +92,7 @@ async function main() {
     }
     requestAnimationFrame(render);
 }
+
 
 function loadTexture(gl) {
     const texture = gl.createTexture();
