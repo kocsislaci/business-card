@@ -1,5 +1,5 @@
-export function initBuffers(gl) {
-  const position = initPositionBuffer(gl);
+export function initBuffers(gl, textureAspect = 1.0) {
+  const position = initPositionBuffer(gl, textureAspect);
   const normal = initNormalBuffer(gl);
   const texCoord = initTexCoordBuffer(gl);
   const color = initColorBuffer(gl);
@@ -12,15 +12,20 @@ export function initBuffers(gl) {
   };
 }
 
-function initPositionBuffer(gl) {
+function initPositionBuffer(gl, aspectRatio) {
   const positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
+  // Create quad with aspect ratio matching the texture
+  // Width = aspectRatio, Height = 1.0 in world space
+  const halfWidth = aspectRatio / 2.0;
+  const halfHeight = 0.5;
+
   const positions = [
-    1.0, 1.0, 0.0,
-    -1.0, 1.0, 0.0,
-    1.0, -1.0, 0.0,
-    -1.0, -1.0, 0.0,
+    halfWidth, halfHeight, 0.0,
+    -halfWidth, halfHeight, 0.0,
+    halfWidth, -halfHeight, 0.0,
+    -halfWidth, -halfHeight, 0.0,
   ];
 
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -46,6 +51,7 @@ function initTexCoordBuffer(gl) {
   const texCoordBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
 
+  // Simple 1:1 UV mapping - texture maps directly to quad
   const texCoords = [
     1.0, 1.0,
     0.0, 1.0,

@@ -13,7 +13,8 @@ varying vec2 vTexCoord;
 varying vec4 vColor;
 
 void main() {
-    vec3 baseColor = vColor.rgb;
+    vec4 texColor = texture2D(uTexture, vTexCoord);
+    vec3 baseColor = texColor.rgb;
     vec3 norm = normalize(vNormal);
     
     // Light direction from light to fragment

@@ -44,8 +44,12 @@ async function main() {
   const shaderProgram = initShaderProgram(gl, vertexShaderSource, fragmentShaderSource);
 
   const programInfo = setupProgramInfo(gl, shaderProgram);
-  const buffers = initBuffers(gl);
-  const texture = loadTexture(gl);
+  let buffers = initBuffers(gl);
+  
+  const texture = loadTexture(gl, '../assets/textures/brick-wall.png', (width, height) => {
+    const textureAspect = width / height;
+    buffers = initBuffers(gl, textureAspect);
+  });
 
   let lastTime = 0;
   function render(currentTime) {

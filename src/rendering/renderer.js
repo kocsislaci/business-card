@@ -16,15 +16,8 @@ export function drawScene(gl, programInfo, buffers, texture, cursorState) {
   mat4.translate(
     modelViewMatrix,
     modelViewMatrix,
-    [-0.0, 0.0, -6.0],
+    [-0.0, 0.0, -2.0],
   );
-  
-  // Scale quad to fill viewport at z=-6
-  const distance = 6.0;
-  const vFOV = fieldOfView;
-  const height = 2.0 * distance * Math.tan(vFOV / 2.0);
-  const width = height * aspect;
-  mat4.scale(modelViewMatrix, modelViewMatrix, [width / 2.0, height / 2.0, 1.0]);
   
   setPositionAttribute(gl, buffers, programInfo);
   setNormalAttribute(gl, buffers, programInfo);
