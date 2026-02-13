@@ -32,10 +32,10 @@ void main() {
     float diff = max(dot(norm, -lightToFrag), 0.0);
     vec3 diffuse = diff * baseColor * spotEffect;
     
-    // Specular
+    // Specular (Blinn-Phong)
     vec3 viewDir = normalize(uCameraPos - vFragPos);
-    vec3 reflectDir = reflect(lightToFrag, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+    vec3 halfDir = normalize(-lightToFrag + viewDir);
+    float spec = pow(max(dot(norm, halfDir), 0.0), 32.0);
     vec3 specular = vec3(0.5) * spec * spotEffect;
     
     vec3 finalColor = ambient + diffuse + specular;
