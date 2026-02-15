@@ -26,7 +26,10 @@ cursorController.addEffect(idleHandEffect, {
 main();
 
 async function main() {
-  const gl = document.querySelector("#canvas").getContext("webgl");
+  const canvas = document.querySelector("#canvas");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const gl = canvas.getContext("webgl");
   if (gl === null) {
     alert(
       "Unable to initialize WebGL. Your browser or machine may not support it.",
