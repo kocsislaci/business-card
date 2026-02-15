@@ -5,6 +5,7 @@ import { loadTexture } from './webgl-utils/textures.js';
 import { initBuffers } from './rendering/buffers.js';
 import { drawScene } from './rendering/renderer.js';
 import { setupProgramInfo } from './rendering/scene.js';
+import { Camera } from './rendering/camera.js';
 
 const cursorController = new CursorController({
   strategy: 'lerp',
@@ -46,6 +47,14 @@ async function main() {
   const programInfo = setupProgramInfo(gl, shaderProgram);
   let buffers = initBuffers(gl);
   
+  const camera = new Camera(
+    [0, 0, 5], // position
+    [0, 0, -1], // target
+    [0, 1, 0], // up
+    45,
+    gl.canvas.clientWidth / gl.canvas.clientHeight,
+  );
+  
   const texture = loadTexture(gl, '../assets/textures/brick-wall.png', (width, height) => {
     const textureAspect = width / height;
     buffers = initBuffers(gl, textureAspect);
@@ -59,7 +68,7 @@ async function main() {
     cursorController.update(deltaTime);
     const cursorState = cursorController.getPosition();
 
-    drawScene(gl, programInfo, buffers, texture, cursorState);
+    drawScene(gl, programInfo, buffers, texture, cursorState, camera);
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);

@@ -22,10 +22,10 @@ function initPositionBuffer(gl, aspectRatio) {
   const halfHeight = 0.5;
 
   const positions = [
-    halfWidth, halfHeight, 0.0,
-    -halfWidth, halfHeight, 0.0,
-    halfWidth, -halfHeight, 0.0,
-    -halfWidth, -halfHeight, 0.0,
+    halfWidth, halfHeight, 0.5,
+    -halfWidth, halfHeight, 0.5,
+    halfWidth, -halfHeight, 0.5,
+    -halfWidth, -halfHeight, 0.5,
   ];
 
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);

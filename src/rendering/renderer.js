@@ -1,23 +1,11 @@
-export function drawScene(gl, programInfo, buffers, texture, cursorState) {
+export function drawScene(gl, programInfo, buffers, texture, cursorState, camera) {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clearDepth(1.0);
   gl.enable(gl.DEPTH_TEST);
   gl.depthFunc(gl.LEQUAL);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  const fieldOfView = (45 * Math.PI) / 180;
-  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-  const zNear = 0.1;
-  const zFar = 100.0;
-  const projectionMatrix = mat4.create();
-
-  mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
-  const modelViewMatrix = mat4.create();
-  mat4.translate(
-    modelViewMatrix,
-    modelViewMatrix,
-    [-0.0, 0.0, -2.0],
-  );
+  const modelMatrix = mat4.create();
   
   setPositionAttribute(gl, buffers, programInfo);
   setNormalAttribute(gl, buffers, programInfo);
@@ -27,14 +15,14 @@ export function drawScene(gl, programInfo, buffers, texture, cursorState) {
   gl.useProgram(programInfo.program);
   
   gl.uniformMatrix4fv(
-    programInfo.uniformLocations.projectionMatrix,
+    programInfo.uniformLocations.modelMatrix,
     false,
-    projectionMatrix,
+    modelMatrix,
   );
   gl.uniformMatrix4fv(
-    programInfo.uniformLocations.modelViewMatrix,
+    programInfo.uniformLocations.viewProjectionMatrix,
     false,
-    modelViewMatrix,
+    camera.getViewProjectionMatrix(),
   );
 
   // Bind texture
@@ -42,20 +30,31 @@ export function drawScene(gl, programInfo, buffers, texture, cursorState) {
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.uniform1i(programInfo.uniformLocations.texture, 0);
 
-  // Compute light direction from cursor position
-  const fov = 45 * Math.PI / 180;
-  const dirX = cursorState.x * aspect * Math.tan(fov / 2);
-  const dirY = cursorState.y * Math.tan(fov / 2);
-  const dirZ = -1.0;
-  const length = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
-  const lightDir = [dirX / length, dirY / length, dirZ / length];
+  // Compute light direction from cursor position in world space
+  const viewDirX = cursorState.x * camera.getAspect() * Math.tan(camera.getFov() / 2);
+  const viewDirY = cursorState.y * Math.tan(camera.getFov() / 2);
+  const viewDirZ = -1.0;
+  
+  // Transform view-space direction to world space
+  // Use inverse view matrix (not view-projection) to rotate direction
+  const invViewMatrix = mat4.create();
+  mat4.invert(invViewMatrix, camera.getViewMatrix());
+  
+  const viewDir = vec4.fromValues(viewDirX, viewDirY, viewDirZ, 0.0);
+  const worldDir4 = vec4.create();
+  vec4.transformMat4(worldDir4, viewDir, invViewMatrix);
+  
+  const worldDir = vec3.fromValues(worldDir4[0], worldDir4[1], worldDir4[2]);
+  vec3.normalize(worldDir, worldDir);
+  
+  const lightDir = [worldDir[0], worldDir[1], worldDir[2]];
 
   // Light uniforms
-  gl.uniform3fv(programInfo.uniformLocations.lightPos, [0.0, 0.0, 0.0]);
+  gl.uniform3fv(programInfo.uniformLocations.lightPos, camera.position);
   gl.uniform3fv(programInfo.uniformLocations.lightDir, lightDir);
   gl.uniform1f(programInfo.uniformLocations.coneAngle, 0.2);
   gl.uniform1f(programInfo.uniformLocations.coneSoftness, 0.08);
-  gl.uniform3fv(programInfo.uniformLocations.cameraPos, [0.0, 0.0, 0.0]);
+  gl.uniform3fv(programInfo.uniformLocations.cameraPos, camera.position);
 
   {
     const offset = 0;

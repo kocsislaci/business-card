@@ -8,14 +8,18 @@ export function setupProgramInfo(gl, shaderProgram) {
       vertexColor: gl.getAttribLocation(shaderProgram, "aVertexColor"),
     },
     uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(shaderProgram, "uProjectionMatrix"),
-      modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
+      // camera
+      cameraPos: gl.getUniformLocation(shaderProgram, "uCameraPos"),
+      // transformation
+      viewProjectionMatrix: gl.getUniformLocation(shaderProgram, "uViewProjectionMatrix"),
+      modelMatrix: gl.getUniformLocation(shaderProgram, "uModelMatrix"),
+      // material
       texture: gl.getUniformLocation(shaderProgram, "uTexture"),
+      // light
       lightPos: gl.getUniformLocation(shaderProgram, "uLightPos"),
       lightDir: gl.getUniformLocation(shaderProgram, "uLightDir"),
       coneAngle: gl.getUniformLocation(shaderProgram, "uConeAngle"),
       coneSoftness: gl.getUniformLocation(shaderProgram, "uConeSoftness"),
-      cameraPos: gl.getUniformLocation(shaderProgram, "uCameraPos"),
     },
   };
 }
