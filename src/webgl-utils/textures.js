@@ -2,10 +2,6 @@ export function loadTexture(gl, url, onLoad) {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
-  // Placeholder 1x1 pixel texture while image loads
-  const pixel = new Uint8Array([255, 100, 150, 255]);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
-
   const image = new Image();
   image.onload = () => {
     gl.bindTexture(gl.TEXTURE_2D, texture);
