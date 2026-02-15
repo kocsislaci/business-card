@@ -6,6 +6,8 @@ export function drawScene(gl, programInfo, buffers, texture, camera, light) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   const modelMatrix = mat4.create();
+
+  mat4.scale(modelMatrix, modelMatrix, [3.0, 3.0, 1.0]);
   
   setPositionAttribute(gl, buffers, programInfo);
   setNormalAttribute(gl, buffers, programInfo);
