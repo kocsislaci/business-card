@@ -33,6 +33,10 @@ export class Camera {
     return this.position;
   }
 
+  getTarget() {
+    return this.target;
+  }
+
   getViewDirection() {
     const viewDirection = vec3.create();
     vec3.subtract(viewDirection, this.target, this.position);

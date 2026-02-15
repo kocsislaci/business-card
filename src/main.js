@@ -6,6 +6,7 @@ import { initBuffers } from './rendering/buffers.js';
 import { drawScene } from './rendering/renderer.js';
 import { setupProgramInfo } from './rendering/scene.js';
 import { Camera } from './rendering/camera.js';
+import { ConeLight } from './rendering/light.js';
 
 const cursorController = new CursorController({
   strategy: 'lerp',
@@ -58,6 +59,13 @@ async function main() {
     gl.canvas.clientWidth / gl.canvas.clientHeight,
   );
   
+  const light = new ConeLight(
+    camera.getPosition(),
+    camera.getTarget(),
+    0.2,
+    0.08
+  );
+  
   const texture = loadTexture(gl, '../assets/textures/brick-wall.png', (width, height) => {
     const textureAspect = width / height;
     buffers = initBuffers(gl, textureAspect);
@@ -71,7 +79,25 @@ async function main() {
     cursorController.update(deltaTime);
     const cursorState = cursorController.getPosition();
 
-    drawScene(gl, programInfo, buffers, texture, cursorState, camera);
+    const viewDirX = cursorState.x * camera.getAspect() * Math.tan(camera.getFov() / 2);
+    const viewDirY = cursorState.y * Math.tan(camera.getFov() / 2);
+    const viewDirZ = -1.0;
+    
+    const invViewMatrix = mat4.create();
+    mat4.invert(invViewMatrix, camera.getViewMatrix());
+    
+    const viewDir = vec4.fromValues(viewDirX, viewDirY, viewDirZ, 0.0);
+    const worldDir4 = vec4.create();
+    vec4.transformMat4(worldDir4, viewDir, invViewMatrix);
+    
+    const worldDir = vec3.fromValues(worldDir4[0], worldDir4[1], worldDir4[2]);
+    vec3.normalize(worldDir, worldDir);
+    
+    const lightTarget = vec3.create();
+    vec3.scaleAndAdd(lightTarget, camera.getPosition(), worldDir, 10.0);
+    light.setTarget(lightTarget[0], lightTarget[1], lightTarget[2]);
+
+    drawScene(gl, programInfo, buffers, texture, camera, light);
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);

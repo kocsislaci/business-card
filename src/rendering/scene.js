@@ -20,6 +20,7 @@ export function setupProgramInfo(gl, shaderProgram) {
       lightDir: gl.getUniformLocation(shaderProgram, "uLightDir"),
       coneAngle: gl.getUniformLocation(shaderProgram, "uConeAngle"),
       coneSoftness: gl.getUniformLocation(shaderProgram, "uConeSoftness"),
+      lightIntensity: gl.getUniformLocation(shaderProgram, "uLightIntensity"),
     },
   };
 }
