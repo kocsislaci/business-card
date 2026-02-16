@@ -13,14 +13,19 @@ export function setupProgramInfo(gl, shaderProgram) {
       // transformation
       viewProjectionMatrix: gl.getUniformLocation(shaderProgram, "uViewProjectionMatrix"),
       modelMatrix: gl.getUniformLocation(shaderProgram, "uModelMatrix"),
-      // material
-      texture: gl.getUniformLocation(shaderProgram, "uTexture"),
+      // material textures
+      albedoTexture: gl.getUniformLocation(shaderProgram, "uAlbedoTexture"),
+      ambientOcclusionTexture: gl.getUniformLocation(shaderProgram, "uAmbientOcclusionTexture"),
+      normalTexture: gl.getUniformLocation(shaderProgram, "uNormalTexture"),
+      roughnessTexture: gl.getUniformLocation(shaderProgram, "uRoughnessTexture"),
+      metallicTexture: gl.getUniformLocation(shaderProgram, "uMetallicTexture"),
       // light
       lightPos: gl.getUniformLocation(shaderProgram, "uLightPos"),
       lightDir: gl.getUniformLocation(shaderProgram, "uLightDir"),
       coneAngle: gl.getUniformLocation(shaderProgram, "uConeAngle"),
       coneSoftness: gl.getUniformLocation(shaderProgram, "uConeSoftness"),
       lightIntensity: gl.getUniformLocation(shaderProgram, "uLightIntensity"),
+      lightColor: gl.getUniformLocation(shaderProgram, "uLightColor"),
     },
   };
 }

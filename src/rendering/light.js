@@ -1,10 +1,11 @@
 export class ConeLight {
-  constructor(position, target, coneAngle, coneSoftness, intensity = 25.0) {
+  constructor(position, target, coneAngle, coneSoftness, intensity = 25.0, color = vec3.fromValues(1.0, 1.0, 1.0)) {
     this.position = vec3.fromValues(...position);
     this.target = vec3.fromValues(...target);
     this.coneAngle = coneAngle;
     this.coneSoftness = coneSoftness;
     this.intensity = intensity;
+    this.color = color;
     this.direction = vec3.create();
     this.updateDirection();
   }

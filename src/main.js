@@ -1,12 +1,13 @@
 import { CursorController } from './cursor-controller/controller.js';
 import { handShakeEffect, idleHandEffect } from './cursor-controller/effects.js';
 import { loadShaderFile, initShaderProgram } from './webgl-utils/shaders.js';
-import { loadTexture } from './webgl-utils/textures.js';
-import { initBuffers } from './rendering/buffers.js';
 import { drawScene } from './rendering/renderer.js';
 import { setupProgramInfo } from './rendering/scene.js';
 import { Camera } from './rendering/camera.js';
 import { ConeLight } from './rendering/light.js';
+import { createQuadGeometry } from './rendering/geometry.js';
+import { Material } from './rendering/material.js';
+import { Model } from './rendering/model.js';
 
 const cursorController = new CursorController({
   strategy: 'lerp',
@@ -49,7 +50,6 @@ async function main() {
   const shaderProgram = initShaderProgram(gl, vertexShaderSource, fragmentShaderSource);
 
   const programInfo = setupProgramInfo(gl, shaderProgram);
-  let buffers = initBuffers(gl);
   
   const camera = new Camera(
     [0, 0, 5], // position
@@ -60,16 +60,29 @@ async function main() {
   );
   
   const light = new ConeLight(
-    camera.getPosition(),
+    vec3.add(vec3.create(), camera.getPosition(), vec3.fromValues(1, -1, -1)),
     camera.getTarget(),
-    0.2,
-    0.08
+    0.3,
+    0.30,
+    50.0,
+    vec3.fromValues(1.0, 1.0, 0.6)
   );
   
-  const texture = loadTexture(gl, '../assets/textures/brick-wall.png', (width, height) => {
-    const textureAspect = width / height;
-    buffers = initBuffers(gl, textureAspect);
-  });
+  const material = new Material(gl);
+  const [
+    { aspectRatio },
+  ] = await Promise.all([
+    material.loadAlbedo('../assets/textures/wall-a.png'),
+    material.loadAmbientOcclusion('../assets/textures/wall-ao.png'),
+    material.loadNormal('../assets/textures/wall-n.png'),
+    material.loadRoughness('../assets/textures/wall-r.png'),
+    material.loadMetallic('../assets/textures/wall-m.png'),
+  ]);
+  
+  const geometry = createQuadGeometry(gl, aspectRatio);
+  
+  const model = new Model(geometry, material);
+  model.setScale(10.0, 10.0, 1.0);
 
   let lastTime = 0;
   function render(currentTime) {
@@ -97,7 +110,7 @@ async function main() {
     vec3.scaleAndAdd(lightTarget, camera.getPosition(), worldDir, 10.0);
     light.setTarget(lightTarget[0], lightTarget[1], lightTarget[2]);
 
-    drawScene(gl, programInfo, buffers, texture, camera, light);
+    drawScene(gl, programInfo, [model], camera, light);
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
