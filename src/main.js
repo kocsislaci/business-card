@@ -106,9 +106,13 @@ async function main() {
     const worldDir = vec3.fromValues(worldDir4[0], worldDir4[1], worldDir4[2]);
     vec3.normalize(worldDir, worldDir);
     
-    const lightTarget = vec3.create();
-    vec3.scaleAndAdd(lightTarget, camera.getPosition(), worldDir, 10.0);
-    light.setTarget(lightTarget[0], lightTarget[1], lightTarget[2]);
+    // Calculate intersection with quad plane at z=0
+    const cameraPos = camera.getPosition();
+    const t = -cameraPos[2] / worldDir[2];
+    const intersectionPoint = vec3.create();
+    vec3.scaleAndAdd(intersectionPoint, cameraPos, worldDir, t);
+    
+    light.setTarget(intersectionPoint[0], intersectionPoint[1], intersectionPoint[2]);
 
     drawScene(gl, programInfo, [model], camera, light);
     requestAnimationFrame(render);
