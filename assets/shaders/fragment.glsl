@@ -69,12 +69,11 @@ void main() {
     float NdotL = max(dot(n, L), 0.0);
     Lo += (kD * albedo / PI + specular) * radiance * NdotL;
 
-    vec3 ambient = 0.06 * ao * albedo;
+    vec3 ambient = 0.002 * ao * albedo;
 
     vec3 finalColor = ambient + Lo;
 
-    // finalColor = finalColor / (finalColor + vec3(1.0));
-    // finalColor = pow(finalColor, vec3(1.0 / 2.2));
+    finalColor = pow(finalColor, vec3(1.0 / GAMMA));
 
     gl_FragColor = vec4(finalColor, 1.0);
 }

@@ -65,10 +65,10 @@ async function main() {
   const light = new ConeLight(
     vec3.add(vec3.create(), camera.getPosition(), vec3.fromValues(1, -1, -1)),
     camera.getTarget(),
-    0.3,
-    0.30,
-    50.0,
-    vec3.fromValues(1.0, 1.0, 0.6)
+    0.25,
+    0.4,
+    40.0,
+    vec3.fromValues(1.0, 1.0, 0.3)
   );
   
   const material = new Material(gl);
@@ -118,7 +118,6 @@ async function main() {
     const worldDir = vec3.fromValues(worldDir4[0], worldDir4[1], worldDir4[2]);
     vec3.normalize(worldDir, worldDir);
     
-    // Calculate intersection with quad plane at z=0
     const cameraPos = camera.getPosition();
     const t = -cameraPos[2] / worldDir[2];
     const intersectionPoint = vec3.create();
