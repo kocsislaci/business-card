@@ -59,6 +59,9 @@ async function main() {
     gl.canvas.clientWidth / gl.canvas.clientHeight,
   );
   
+  const cameraTiltSensitivity = 0.4;
+  const baseCameraTarget = vec3.fromValues(0, 0, -1);
+  
   const light = new ConeLight(
     vec3.add(vec3.create(), camera.getPosition(), vec3.fromValues(1, -1, -1)),
     camera.getTarget(),
@@ -91,6 +94,15 @@ async function main() {
 
     cursorController.update(deltaTime);
     const cursorState = cursorController.getPosition();
+
+    const cameraTiltOffset = vec3.fromValues(
+      cursorState.x * cameraTiltSensitivity,
+      cursorState.y * cameraTiltSensitivity,
+      0
+    );
+    const newCameraTarget = vec3.create();
+    vec3.add(newCameraTarget, baseCameraTarget, cameraTiltOffset);
+    camera.lookAt(newCameraTarget[0], newCameraTarget[1], newCameraTarget[2]);
 
     const viewDirX = cursorState.x * camera.getAspect() * Math.tan(camera.getFov() / 2);
     const viewDirY = cursorState.y * Math.tan(camera.getFov() / 2);
