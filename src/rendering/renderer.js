@@ -10,16 +10,16 @@ export function drawScene(gl, programInfo, models, camera, light) {
   gl.uniformMatrix4fv(
     programInfo.uniformLocations.viewProjectionMatrix,
     false,
-    camera.getViewProjectionMatrix(),
+    camera.viewProjectionMatrix,
   );
 
   gl.uniform3fv(programInfo.uniformLocations.cameraPos, camera.position);
 
-  gl.uniform3fv(programInfo.uniformLocations.lightPos, light.getPosition());
-  gl.uniform3fv(programInfo.uniformLocations.lightDir, light.getDirection());
-  gl.uniform1f(programInfo.uniformLocations.coneAngle, light.getConeAngle());
-  gl.uniform1f(programInfo.uniformLocations.coneSoftness, light.getConeSoftness());
-  gl.uniform1f(programInfo.uniformLocations.lightIntensity, light.getIntensity());
+  gl.uniform3fv(programInfo.uniformLocations.lightPos, light.position);
+  gl.uniform3fv(programInfo.uniformLocations.lightDir, light.direction);
+  gl.uniform1f(programInfo.uniformLocations.coneAngle, light.coneAngle);
+  gl.uniform1f(programInfo.uniformLocations.coneSoftness, light.coneSoftness);
+  gl.uniform1f(programInfo.uniformLocations.lightIntensity, light.intensity);
   gl.uniform3fv(programInfo.uniformLocations.lightColor, light.color);
 
   for (const model of models) {

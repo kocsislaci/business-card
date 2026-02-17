@@ -63,8 +63,8 @@ async function main() {
   const baseCameraTarget = vec3.fromValues(0, 0, -1);
   
   const light = new ConeLight(
-    vec3.add(vec3.create(), camera.getPosition(), vec3.fromValues(1, -1, -1)),
-    camera.getTarget(),
+    vec3.add(vec3.create(), camera.position, vec3.fromValues(1, -1, -1)),
+    camera.target,
     0.25,
     0.4,
     40.0,
@@ -105,12 +105,12 @@ async function main() {
     vec3.add(newCameraTarget, baseCameraTarget, cameraTiltOffset);
     camera.lookAt(newCameraTarget[0], newCameraTarget[1], newCameraTarget[2]);
 
-    const viewDirX = cursorState.x * camera.getAspect() * Math.tan(camera.getFov() / 2);
-    const viewDirY = cursorState.y * Math.tan(camera.getFov() / 2);
+    const viewDirX = cursorState.x * camera.aspect * Math.tan(camera.fov / 2);
+    const viewDirY = cursorState.y * Math.tan(camera.fov / 2);
     const viewDirZ = -1.0;
     
     const invViewMatrix = mat4.create();
-    mat4.invert(invViewMatrix, camera.getViewMatrix());
+    mat4.invert(invViewMatrix, camera.viewMatrix);
     
     const viewDir = vec4.fromValues(viewDirX, viewDirY, viewDirZ, 0.0);
     const worldDir4 = vec4.create();
@@ -119,7 +119,7 @@ async function main() {
     const worldDir = vec3.fromValues(worldDir4[0], worldDir4[1], worldDir4[2]);
     vec3.normalize(worldDir, worldDir);
     
-    const cameraPos = camera.getPosition();
+    const cameraPos = camera.position;
     const t = -cameraPos[2] / worldDir[2];
     const intersectionPoint = vec3.create();
     vec3.scaleAndAdd(intersectionPoint, cameraPos, worldDir, t);

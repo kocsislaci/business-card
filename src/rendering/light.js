@@ -1,47 +1,42 @@
 export class ConeLight {
   constructor(position, target, coneAngle, coneSoftness, intensity = 25.0, color = vec3.fromValues(1.0, 1.0, 1.0)) {
-    this.position = vec3.fromValues(...position);
-    this.target = vec3.fromValues(...target);
-    this.coneAngle = coneAngle;
-    this.coneSoftness = coneSoftness;
-    this.intensity = intensity;
+    this._position = vec3.fromValues(...position);
+    this._target = vec3.fromValues(...target);
+    this._coneAngle = coneAngle;
+    this._coneSoftness = coneSoftness;
+    this._intensity = intensity;
     this.color = color;
-    this.direction = vec3.create();
+    this._direction = vec3.create();
     this.updateDirection();
   }
   
   updateDirection() {
-    vec3.subtract(this.direction, this.target, this.position);
-    vec3.normalize(this.direction, this.direction);
+    vec3.subtract(this._direction, this._target, this._position);
+    vec3.normalize(this._direction, this._direction);
   }
   
-  getPosition() {
-    return this.position;
+  get position() {
+    return this._position;
   }
   
-  getDirection() {
-    return this.direction;
+  get direction() {
+    return this._direction;
   }
   
-  getConeAngle() {
-    return this.coneAngle;
+  get coneAngle() {
+    return this._coneAngle;
   }
   
-  getConeSoftness() {
-    return this.coneSoftness;
+  get coneSoftness() {
+    return this._coneSoftness;
   }
   
-  getIntensity() {
-    return this.intensity;
-  }
-  
-  setPosition(x, y, z) {
-    vec3.set(this.position, x, y, z);
-    this.updateDirection();
+  get intensity() {
+    return this._intensity;
   }
   
   setTarget(x, y, z) {
-    vec3.set(this.target, x, y, z);
+    vec3.set(this._target, x, y, z);
     this.updateDirection();
   }
 }
