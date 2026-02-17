@@ -68,7 +68,7 @@ async function main() {
     0.25,
     0.4,
     40.0,
-    vec3.fromValues(1.0, 1.0, 0.3)
+    vec3.fromValues(1.0, 1.0, 0.4)
   );
   
   const material = new Material(gl);
