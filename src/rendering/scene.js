@@ -16,6 +16,7 @@ export function setupProgramInfo(gl, shaderProgram) {
       normalTexture: gl.getUniformLocation(shaderProgram, "uNormalTexture"),
       roughnessTexture: gl.getUniformLocation(shaderProgram, "uRoughnessTexture"),
       metallicTexture: gl.getUniformLocation(shaderProgram, "uMetallicTexture"),
+      displacementTexture: gl.getUniformLocation(shaderProgram, "uDisplacementTexture"),
 
       lightPos: gl.getUniformLocation(shaderProgram, "uLightPos"),
       lightDir: gl.getUniformLocation(shaderProgram, "uLightDir"),

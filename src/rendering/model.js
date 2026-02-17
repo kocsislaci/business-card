@@ -38,10 +38,19 @@ export class Model {
       this.modelMatrix
     );
     
-    gl.drawArrays(
-      this.geometry.drawMode,
-      0,
-      this.geometry.vertexCount
-    );
+    if (this.geometry.indices) {
+      gl.drawElements(
+        this.geometry.drawMode,
+        this.geometry.vertexCount,
+        gl.UNSIGNED_SHORT,
+        0
+      );
+    } else {
+      gl.drawArrays(
+        this.geometry.drawMode,
+        0,
+        this.geometry.vertexCount
+      );
+    }
   }
 }

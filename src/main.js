@@ -80,6 +80,7 @@ async function main() {
     material.loadNormal('../assets/textures/wall-n.png'),
     material.loadRoughness('../assets/textures/wall-r.png'),
     material.loadMetallic('../assets/textures/wall-m.png'),
+    material.loadDisplacement('../assets/textures/wall-d.png'),
   ]);
   
   const geometry = createQuadGeometry(gl, aspectRatio);

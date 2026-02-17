@@ -8,6 +8,7 @@ export class Material {
     this.normalTexture = null;
     this.roughnessTexture = null;
     this.metallicTexture = null;
+    this.displacementTexture = null;
   }
 
   async loadAlbedo(url) {
@@ -40,6 +41,12 @@ export class Material {
     return { width, height, aspectRatio: width / height };
   }
 
+  async loadDisplacement(url) {
+    const { texture, width, height } = await loadTexture(this.gl, url);
+    this.displacementTexture = texture;
+    return { width, height, aspectRatio: width / height };
+  }
+
   bind(gl, programInfo) {
     if (this.albedoTexture) {
       gl.activeTexture(gl.TEXTURE0);
@@ -69,6 +76,12 @@ export class Material {
       gl.activeTexture(gl.TEXTURE4);
       gl.bindTexture(gl.TEXTURE_2D, this.metallicTexture);
       gl.uniform1i(programInfo.uniformLocations.metallicTexture, 4);
+    }
+
+    if (this.displacementTexture) {
+      gl.activeTexture(gl.TEXTURE5);
+      gl.bindTexture(gl.TEXTURE_2D, this.displacementTexture);
+      gl.uniform1i(programInfo.uniformLocations.displacementTexture, 5);
     }
   }
 }
