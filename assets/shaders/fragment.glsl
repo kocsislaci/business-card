@@ -18,10 +18,8 @@ uniform float uConeSoftness;
 uniform float uLightIntensity;
 uniform vec3 uLightColor;
 
-varying vec3 vNormal;
 varying vec3 vFragPos;
 varying vec2 vTexCoord;
-varying vec4 vColor;
 
 float calculateSpotEffect(vec3 w_i, vec3 lightDir, float coneAngle, float coneSoftness);
 float distributionGGX(vec3 N, vec3 H, float roughness);

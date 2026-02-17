@@ -3,9 +3,7 @@ export function setupProgramInfo(gl, shaderProgram) {
     program: shaderProgram,
     attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
-      vertexNormal: gl.getAttribLocation(shaderProgram, "aVertexNormal"),
       texCoord: gl.getAttribLocation(shaderProgram, "aTexCoord"),
-      vertexColor: gl.getAttribLocation(shaderProgram, "aVertexColor"),
     },
     uniformLocations: {
       cameraPos: gl.getUniformLocation(shaderProgram, "uCameraPos"),
