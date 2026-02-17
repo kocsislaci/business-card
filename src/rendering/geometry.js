@@ -89,10 +89,10 @@ export function createQuadGeometry(gl, aspectRatio = 1.0) {
   ];
 
   const colors = [
-    1.0, 0.0, 0.0, 1.0,  // Red (top-right)
-    0.0, 1.0, 0.0, 1.0,  // Green (top-left)
-    0.0, 0.0, 1.0, 1.0,  // Blue (bottom-right)
-    1.0, 1.0, 1.0, 1.0,  // White (bottom-left)
+    1.0, 0.0, 0.0, 1.0,
+    0.0, 1.0, 0.0, 1.0,
+    0.0, 0.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0,
   ];
 
   return new Geometry(gl, positions, normals, texCoords, colors, gl.TRIANGLE_STRIP, 4);

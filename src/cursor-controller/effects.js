@@ -1,10 +1,3 @@
-/**
- * Configuration parameters:
- * @param {number} config.intensity - Base shake strength in coordinate units (default: 1.5)
- * @param {number} config.frequency - Shake frequency in Hz (default: 8.0)
- * @param {number} config.velocityScale - How much velocity affects shake (default: 0.02)
- * @param {number} config.minVelocity - Velocity threshold below which no shake occurs (default: 50)
- */
 export const handShakeEffect = {
   apply(state, deltaTime, effectState, config) {
     if (!effectState.time) {
@@ -40,12 +33,6 @@ export const handShakeEffect = {
   }
 };
 
-/**
- * Configuration parameters:
- * @param {number} config.intensity - Drift radius in coordinate units (default: 3.0)
- * @param {number} config.frequency - Drift speed in Hz (default: 0.8)
- * @param {number} config.maxVelocity - Velocity threshold above which effect fades out (default: 100)
- */
 export const idleHandEffect = {
   apply(state, deltaTime, effectState, config) {
     if (!effectState.time) {
