@@ -42,7 +42,7 @@ async function main() {
   window.addEventListener('pointermove', (event) => {
     const x = (event.clientX / window.innerWidth) * 2 - 1;
     const y = -((event.clientY / window.innerHeight) * 2 - 1);
-    cursorController.setTarget(x, y);
+    cursorController.target = { x, y };
   });
 
   const vertexShaderSource = await loadShaderFile('../assets/shaders/vertex.glsl');
@@ -93,7 +93,7 @@ async function main() {
     lastTime = currentTime;
 
     cursorController.update(deltaTime);
-    const cursorState = cursorController.getPosition();
+    const cursorState = cursorController.position;
 
     const cameraTiltOffset = vec3.fromValues(
       cursorState.x * cameraTiltSensitivity,

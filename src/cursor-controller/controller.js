@@ -3,7 +3,7 @@ import { lerpStrategy, springStrategy } from './strategies.js';
 export class CursorController {
   constructor(config = {}) {
     this.current = { x: 0, y: 0 };
-    this.target = { x: 0, y: 0 };
+    this._target = { x: 0, y: 0 };
     this.velocity = { x: 0, y: 0 };
     this.state = {};
     this.config = {
@@ -35,12 +35,12 @@ export class CursorController {
     }
     
     const strategyConfig = this.config[this.config.strategy];
-    const result = strategy.update(this.current, this.target, deltaTime, strategyConfig, this.velocity);
+    const result = strategy.update(this.current, this._target, deltaTime, strategyConfig, this.velocity);
     
     let state = {
       position: result.position,
       velocity: result.velocity,
-      target: this.target
+      target: this._target
     };
     
     for (const { effect, config, state: effectState } of this.effectsPipeline) {
@@ -52,12 +52,12 @@ export class CursorController {
     this.velocity = state.velocity;
   }
 
-  setTarget(x, y) {
-    this.target.x = x;
-    this.target.y = y;
-  }  
+  set target(value) {
+    this._target.x = value.x;
+    this._target.y = value.y;
+  }
   
-  getPosition() {
+  get position() {
     return { ...this.current };
   }
 }
