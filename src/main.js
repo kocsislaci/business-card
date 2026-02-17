@@ -39,6 +39,8 @@ async function main() {
     return;
   }
 
+  const nameElement = document.getElementById('name');
+
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
   window.addEventListener('pointermove', (event) => {
@@ -113,6 +115,10 @@ async function main() {
     const newCameraTarget = vec3.create();
     vec3.add(newCameraTarget, baseCameraTarget, cameraTiltOffset);
     camera.lookAt(newCameraTarget[0], newCameraTarget[1], newCameraTarget[2]);
+    
+    const offsetX = -cursorState.x * cameraTiltSensitivity * canvas.width * 0.135;
+    const offsetY = cursorState.y * cameraTiltSensitivity * canvas.height * 0.225;
+    nameElement.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 
     const viewDirX = cursorState.x * camera.aspect * Math.tan(camera.fov / 2);
     const viewDirY = cursorState.y * Math.tan(camera.fov / 2);

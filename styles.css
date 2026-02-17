@@ -6,6 +6,7 @@
 body {
     background-color: black;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    overflow: hidden;
 }
 #canvas {
     position: absolute;
@@ -30,13 +31,12 @@ body {
             drop-shadow(0 0 40px rgba(0, 0, 0, 0.2));
     
     letter-spacing: -0.02em;
-    transition: all 0.3s ease;
+    transition: filter 0.3s ease;
 }
 
 #name:hover {
     filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5))
             drop-shadow(0 0 60px rgba(0, 0, 0, 0.3));
-    transform: translateY(-2px);
 }
 #links {
     position: absolute;
