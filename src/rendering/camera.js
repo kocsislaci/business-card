@@ -1,3 +1,5 @@
+import { mat4, vec3 } from 'gl-matrix';
+
 export class Camera {
   constructor(position, target, up, fov, aspect) {
     this._position = vec3.fromValues(position[0], position[1], position[2]);

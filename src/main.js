@@ -1,6 +1,7 @@
+import { mat4, vec3, vec4 } from 'gl-matrix';
 import { CursorController } from './cursor-controller/controller.js';
 import { handShakeEffect, idleHandEffect } from './cursor-controller/effects.js';
-import { loadShaderFile, initShaderProgram } from './webgl-utils/shaders.js';
+import { initShaderProgram } from './webgl-utils/shaders.js';
 import { drawScene } from './rendering/renderer.js';
 import { setupProgramInfo } from './rendering/scene.js';
 import { Camera } from './rendering/camera.js';
@@ -8,6 +9,8 @@ import { ConeLight } from './rendering/light.js';
 import { createQuadGeometry } from './rendering/geometry.js';
 import { Material } from './rendering/material.js';
 import { Model } from './rendering/model.js';
+import vertexShaderSource from '../assets/shaders/vertex.glsl';
+import fragmentShaderSource from '../assets/shaders/fragment.glsl';
 
 const cursorController = new CursorController({
   strategy: 'lerp',
@@ -49,8 +52,6 @@ async function main() {
     cursorController.target = { x, y };
   });
 
-  const vertexShaderSource = await loadShaderFile('../assets/shaders/vertex.glsl');
-  const fragmentShaderSource = await loadShaderFile('../assets/shaders/fragment.glsl');
   const shaderProgram = initShaderProgram(gl, vertexShaderSource, fragmentShaderSource);
 
   const programInfo = setupProgramInfo(gl, shaderProgram);
@@ -86,12 +87,12 @@ async function main() {
   const [
     { aspectRatio },
   ] = await Promise.all([
-    material.loadAlbedo('../assets/textures/wall-a.png'),
-    material.loadAmbientOcclusion('../assets/textures/wall-ao.png'),
-    material.loadNormal('../assets/textures/wall-n.png'),
-    material.loadRoughness('../assets/textures/wall-r.png'),
-    material.loadMetallic('../assets/textures/wall-m.png'),
-    material.loadDisplacement('../assets/textures/wall-d.png'),
+    material.loadAlbedo('/assets/textures/wall-a.png'),
+    material.loadAmbientOcclusion('/assets/textures/wall-ao.png'),
+    material.loadNormal('/assets/textures/wall-n.png'),
+    material.loadRoughness('/assets/textures/wall-r.png'),
+    material.loadMetallic('/assets/textures/wall-m.png'),
+    material.loadDisplacement('/assets/textures/wall-d.png'),
   ]);
   
   const geometry = createQuadGeometry(gl, aspectRatio);

@@ -1,3 +1,5 @@
+import { mat4 } from 'gl-matrix';
+
 export class Model {
   constructor(geometry, material) {
     this.geometry = geometry;

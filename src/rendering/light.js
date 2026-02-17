@@ -1,3 +1,5 @@
+import { vec3 } from 'gl-matrix';
+
 export class ConeLight {
   constructor(position, target, coneAngle, coneSoftness, intensity = 25.0, color = vec3.fromValues(1.0, 1.0, 1.0)) {
     this._position = vec3.fromValues(...position);

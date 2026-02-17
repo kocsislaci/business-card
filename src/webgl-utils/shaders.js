@@ -1,12 +1,3 @@
-export async function loadShaderFile(url) {
-  const response = await fetch(url);
-  if (!response.ok) {
-    alert(`Failed to load shader file: ${url}`);
-    return null;
-  }
-  return await response.text();
-}
-
 export function initShaderProgram(gl, vsSource, fsSource) {
   const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
   const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
