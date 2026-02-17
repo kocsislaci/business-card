@@ -44,6 +44,11 @@ export class Camera {
   get aspect() {
     return this._aspect;
   }
+
+  set aspect(value) {
+    this._aspect = value;
+    this.updateMatrices();
+  }
   
   lookAt(targetX, targetY, targetZ) {
     vec3.set(this._target, targetX, targetY, targetZ);

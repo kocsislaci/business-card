@@ -39,6 +39,8 @@ async function main() {
     return;
   }
 
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
   window.addEventListener('pointermove', (event) => {
     const x = (event.clientX / window.innerWidth) * 2 - 1;
     const y = -((event.clientY / window.innerHeight) * 2 - 1);
@@ -58,6 +60,13 @@ async function main() {
     45,
     gl.canvas.clientWidth / gl.canvas.clientHeight,
   );
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    camera.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+  });
   
   const cameraTiltSensitivity = 0.4;
   const baseCameraTarget = vec3.fromValues(0, 0, -1);
