@@ -1,4 +1,6 @@
+import { inject } from '@vercel/analytics';
 import { mat4, vec3, vec4 } from 'gl-matrix';
+
 import { CursorController } from './cursor-controller/controller.js';
 import { handShakeEffect, idleHandEffect } from './cursor-controller/effects.js';
 import { initShaderProgram } from './webgl-utils/shaders.js';
@@ -11,6 +13,10 @@ import { Material } from './rendering/material.js';
 import { Model } from './rendering/model.js';
 import vertexShaderSource from '../assets/shaders/vertex.glsl';
 import fragmentShaderSource from '../assets/shaders/fragment.glsl';
+
+inject({
+  debug: import.meta.env.DEV,
+});
 
 const cursorController = new CursorController({
   strategy: 'lerp',
