@@ -12,8 +12,8 @@ import { ConeLight } from './rendering/light.js';
 import { createQuadGeometry } from './rendering/geometry.js';
 import { Material } from './rendering/material.js';
 import { Model } from './rendering/model.js';
-import vertexShaderSource from '../assets/shaders/vertex.glsl';
-import fragmentShaderSource from '../assets/shaders/fragment.glsl';
+import vertexShaderSource from './shaders/vertex.glsl';
+import fragmentShaderSource from './shaders/fragment.glsl';
 
 inject({
   debug: import.meta.env.DEV,
@@ -102,7 +102,6 @@ async function main() {
     material.loadAmbientOcclusion('/assets/textures/wall-ao.png'),
     material.loadNormal('/assets/textures/wall-n.png'),
     material.loadRoughness('/assets/textures/wall-r.png'),
-    material.loadMetallic('/assets/textures/wall-m.png'),
     material.loadDisplacement('/assets/textures/wall-d.png'),
   ]);
   
