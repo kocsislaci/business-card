@@ -1,4 +1,5 @@
 import { inject } from '@vercel/analytics';
+import { injectSpeedInsights } from '@vercel/speed-insights';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 
 import { CursorController } from './cursor-controller/controller.js';
@@ -15,6 +16,10 @@ import vertexShaderSource from '../assets/shaders/vertex.glsl';
 import fragmentShaderSource from '../assets/shaders/fragment.glsl';
 
 inject({
+  debug: import.meta.env.DEV,
+});
+
+injectSpeedInsights({
   debug: import.meta.env.DEV,
 });
 
