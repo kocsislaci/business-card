@@ -98,11 +98,11 @@ async function main() {
   const [
     { aspectRatio },
   ] = await Promise.all([
-    material.loadAlbedo('/assets/textures/wall-a.png'),
-    material.loadAmbientOcclusion('/assets/textures/wall-ao.png'),
-    material.loadNormal('/assets/textures/wall-n.png'),
-    material.loadRoughness('/assets/textures/wall-r.png'),
-    material.loadDisplacement('/assets/textures/wall-d.png'),
+    material.loadAlbedo('/assets/textures/wall-a.webp'),
+    material.loadAmbientOcclusion('/assets/textures/wall-ao.webp'),
+    material.loadNormal('/assets/textures/wall-n.webp'),
+    material.loadRoughness('/assets/textures/wall-r.webp'),
+    material.loadDisplacement('/assets/textures/wall-d.webp'),
   ]);
   
   const geometry = createQuadGeometry(gl, aspectRatio);
