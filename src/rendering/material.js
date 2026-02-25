@@ -7,7 +7,6 @@ export class Material {
     this.ambientOcclusionTexture = null;
     this.normalTexture = null;
     this.roughnessTexture = null;
-    this.metallicTexture = null;
     this.displacementTexture = null;
   }
 
@@ -32,12 +31,6 @@ export class Material {
   async loadRoughness(url) {
     const { texture, width, height } = await loadTexture(this.gl, url);
     this.roughnessTexture = texture;
-    return { width, height, aspectRatio: width / height };
-  }
-
-  async loadMetallic(url) {
-    const { texture, width, height } = await loadTexture(this.gl, url);
-    this.metallicTexture = texture;
     return { width, height, aspectRatio: width / height };
   }
 
@@ -70,12 +63,6 @@ export class Material {
       gl.activeTexture(gl.TEXTURE3);
       gl.bindTexture(gl.TEXTURE_2D, this.roughnessTexture);
       gl.uniform1i(programInfo.uniformLocations.roughnessTexture, 3);
-    }
-
-    if (this.metallicTexture) {
-      gl.activeTexture(gl.TEXTURE4);
-      gl.bindTexture(gl.TEXTURE_2D, this.metallicTexture);
-      gl.uniform1i(programInfo.uniformLocations.metallicTexture, 4);
     }
 
     if (this.displacementTexture) {
