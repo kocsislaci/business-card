@@ -1,6 +1,9 @@
 import { inject } from '@vercel/analytics';
 import { injectSpeedInsights } from '@vercel/speed-insights';
 import { mat4, vec3, vec4 } from 'gl-matrix';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/700.css';
+import '@fontsource/roboto/900.css';
 
 import { CursorController } from './cursor-controller/controller.js';
 import { handShakeEffect, idleHandEffect } from './cursor-controller/effects.js';
