@@ -31,7 +31,7 @@ const cursorController = new CursorController({
   lerp: { damping: 10.0 }
 });
 cursorController.addEffect(handShakeEffect, {
-  intensity: 0.00002,
+  intensity: 0.00007,
   frequency: 8.0,
   velocityScale: 0.5,
   minVelocity: 1
