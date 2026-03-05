@@ -22,6 +22,8 @@ body {
 }
 
 #name {
+    display: none;
+
     width: max-content;
     font-size: clamp(3rem, 7vw, 10rem);
     font-weight: 600;
