@@ -27,6 +27,7 @@ export function setupProgramInfo(gl, shaderProgram) {
       lightViewProjectionMatrix: gl.getUniformLocation(shaderProgram, "uLightViewProjectionMatrix"),
       shadowMap: gl.getUniformLocation(shaderProgram, "uShadowMap"),
       shadowMapPixelSize: gl.getUniformLocation(shaderProgram, "uShadowMapPixelSize"),
+      metallic: gl.getUniformLocation(shaderProgram, "uMetallic"),
     },
   };
 }

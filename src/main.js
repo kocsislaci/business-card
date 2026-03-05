@@ -101,6 +101,7 @@ async function main() {
   
   const wallObject = await createSceneObject(gl, '/assets/textures/wall', vec3.fromValues(10.0, 10.0, 1.0), vec3.fromValues(0.0, 0.0, 0.0), vec3.fromValues(0.0, 0.0, 0.0));
   const nameObject = await createSceneObject(gl, '/assets/textures/name', vec3.fromValues(0.4, 0.4, 1.0), vec3.fromValues(0.0, 0.0, 0.2), vec3.fromValues(0.0, 0.0, 0.0));
+  nameObject.material.metallic = 0.5;
   const objects = [wallObject, nameObject];
 
   let lastTime = 0;

@@ -18,6 +18,7 @@ uniform float uLightIntensity;
 uniform vec3 uLightColor;
 uniform sampler2D uShadowMap;
 uniform vec2 uShadowMapPixelSize;
+uniform float uMetallic;
 
 varying vec3 vFragPos;
 varying vec2 vTexCoord;
@@ -41,7 +42,7 @@ void main() {
     vec3 v = normalize(uCameraPos - vFragPos);
     float cosTheta = max(dot(n, -w_i), 0.0);
 
-    vec3 F0 = mix(vec3(0.04), albedo, 0.0); // 0.0 is the metallic value
+    vec3 F0 = mix(vec3(0.04), albedo, uMetallic);
 
     vec3 Lo = vec3(0.0);
 
@@ -60,8 +61,7 @@ void main() {
     vec3 F = fresnelSchlick(max(dot(H, v), 0.0), F0);
 
     vec3 kS = F;
-    vec3 kD = vec3(1.0) - kS;
-    // kD *= 1.0 - metallic; // metallic is 0.0 for non-metallic materials
+    vec3 kD = (vec3(1.0) - kS) * (1.0 - uMetallic);
 
     vec3 numerator = NDF * G * F;
     float denominator = 4.0 * max(dot(n, v), 0.0) * max(dot(n, L), 0.0) + 0.0001;
