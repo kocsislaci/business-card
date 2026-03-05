@@ -28,6 +28,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0);
 
 void main() {
     vec3 albedo = texture2D(uAlbedoTexture, vTexCoord).rgb;
+    float albedoAlpha = texture2D(uAlbedoTexture, vTexCoord).a;
     vec3 n = normalize(texture2D(uNormalTexture, vTexCoord).rgb);
     float ao = texture2D(uAmbientOcclusionTexture, vTexCoord).r;
     float roughness = texture2D(uRoughnessTexture, vTexCoord).r;
@@ -71,7 +72,7 @@ void main() {
 
     finalColor = pow(finalColor, vec3(1.0 / GAMMA));
 
-    gl_FragColor = vec4(finalColor, 1.0);
+    gl_FragColor = vec4(finalColor, albedoAlpha);
 }
 
 float calculateSpotEffect(vec3 w_i, vec3 lightDir, float coneAngle, float coneSoftness) {
