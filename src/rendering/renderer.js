@@ -3,7 +3,7 @@ const SHADOW_MAP_FAR = 20;
 const SHADOW_MAP_TEXTURE_UNIT = 4;
 
 export function drawScene(gl, programInfo, shadowProgramInfo, shadowMap, models, camera, light) {
-  const lightViewProjection = light.getViewProjectionMatrix(SHADOW_MAP_NEAR, SHADOW_MAP_FAR);
+  const lightViewProjection = light.getShadowViewProjectionMatrix(SHADOW_MAP_NEAR, SHADOW_MAP_FAR);
 
   // Shadow pass
   shadowMap.bind();
