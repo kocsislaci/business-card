@@ -23,29 +23,12 @@ body {
 
 #name {
     display: none;
-
     width: max-content;
     font-size: clamp(3rem, 7vw, 10rem);
     font-weight: 600;
     text-align: center;
-        
-    /* Modern gradient text */
-    background: linear-gradient(135deg, #000000 0%, #000000 50%, #000000 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3))
-            drop-shadow(0 0 40px rgba(0, 0, 0, 0.2));
-    
-    letter-spacing: -0.02em;
-    transition: filter 0.3s ease;
 }
 
-#name:hover {
-    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5))
-            drop-shadow(0 0 60px rgba(0, 0, 0, 0.3));
-}
 #links {
     position: absolute;
     bottom: 3rem;
