@@ -91,17 +91,17 @@ async function main() {
   
   
   const light = new ConeLight(
-    vec3.add(vec3.create(), camera.position, vec3.fromValues(1.0, -1.0, -1.0)),
+    vec3.add(vec3.create(), camera.position, vec3.fromValues(1.0, -0.5, -0.5)),
     camera.target,
     3.1415/18.0, // 10 degrees
-    3.1415/4.5, // 40 degrees
+    3.1415/6, // 30 degrees
     40.0,
     vec3.fromValues(1.0, 1.0, 1.0)
   );
   
   const wallObject = await createSceneObject(gl, '/assets/textures/wall', vec3.fromValues(10.0, 10.0, 1.0), vec3.fromValues(0.0, 0.0, 0.0), vec3.fromValues(0.0, 0.0, 0.0));
-  const nameObject = await createSceneObject(gl, '/assets/textures/name', vec3.fromValues(0.4, 0.4, 1.0), vec3.fromValues(0.0, 0.0, 0.2), vec3.fromValues(0.0, 0.0, 0.0));
-  nameObject.material.metallic = 0.5;
+  const nameObject = await createSceneObject(gl, '/assets/textures/name', vec3.fromValues(0.5, 0.5, 1.0), vec3.fromValues(0.0, 0.0, 0.3), vec3.fromValues(0.0, 0.0, 0.0));
+  nameObject.material.metallic = 0.8;
   const objects = [wallObject, nameObject];
 
   let lastTime = 0;
