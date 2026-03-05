@@ -3,6 +3,7 @@ import { loadTexture } from '../webgl-utils/textures.js';
 export class Material {
   constructor(gl) {
     this.gl = gl;
+    this.metallic = 0.0;
     this.albedoTexture = null;
     this.ambientOcclusionTexture = null;
     this.normalTexture = null;
@@ -69,6 +70,10 @@ export class Material {
       gl.activeTexture(gl.TEXTURE5);
       gl.bindTexture(gl.TEXTURE_2D, this.displacementTexture);
       gl.uniform1i(programInfo.uniformLocations.displacementTexture, 5);
+    }
+
+    if (programInfo.uniformLocations.metallic != null) {
+      gl.uniform1f(programInfo.uniformLocations.metallic, this.metallic);
     }
   }
 }
