@@ -45,6 +45,26 @@ export class SceneObject {
       gl.drawArrays(this.geometry.drawMode, 0, this.geometry.vertexCount);
     }
   }
+
+  drawShadow(gl, shadowProgramInfo) {
+    this.geometry.bind(gl, shadowProgramInfo);
+    if (this.material.displacementTexture) {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.material.displacementTexture);
+      gl.uniform1i(shadowProgramInfo.uniformLocations.displacementTexture, 0);
+    }
+    if (this.material.albedoTexture) {
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, this.material.albedoTexture);
+      gl.uniform1i(shadowProgramInfo.uniformLocations.albedoTexture, 1);
+    }
+    gl.uniformMatrix4fv(shadowProgramInfo.uniformLocations.modelMatrix, false, this.modelMatrix);
+    if (this.geometry.indices) {
+      gl.drawElements(this.geometry.drawMode, this.geometry.vertexCount, gl.UNSIGNED_SHORT, 0);
+    } else {
+      gl.drawArrays(this.geometry.drawMode, 0, this.geometry.vertexCount);
+    }
+  }
 }
 
 export async function createSceneObject(

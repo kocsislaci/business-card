@@ -2,22 +2,16 @@ attribute vec4 aVertexPosition;
 attribute vec2 aTexCoord;
 
 uniform mat4 uModelMatrix;
-uniform mat4 uViewProjectionMatrix;
 uniform mat4 uLightViewProjectionMatrix;
-
 uniform sampler2D uDisplacementTexture;
 
-varying vec3 vFragPos;
 varying vec2 vTexCoord;
-varying vec4 vLightSpacePos;
 
 void main() {
+    vTexCoord = aTexCoord;
     vec4 displacement = texture2D(uDisplacementTexture, aTexCoord);
     vec4 worldPosition = uModelMatrix * aVertexPosition;
     worldPosition.z += displacement.r;
 
-    vFragPos = vec3(worldPosition);
-    vTexCoord = aTexCoord;
-    vLightSpacePos = uLightViewProjectionMatrix * worldPosition;
-    gl_Position = uViewProjectionMatrix * worldPosition;    
+    gl_Position = uLightViewProjectionMatrix * worldPosition;
 }

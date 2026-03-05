@@ -9,12 +9,15 @@ import { CursorController } from './cursor-controller/controller.js';
 import { handShakeEffect, idleHandEffect } from './cursor-controller/effects.js';
 import { initShaderProgram } from './webgl-utils/shaders.js';
 import { drawScene } from './rendering/renderer.js';
-import { setupProgramInfo } from './rendering/scene.js';
+import { setupProgramInfo, setupShadowProgramInfo } from './rendering/scene.js';
 import { Camera } from './rendering/camera.js';
 import { ConeLight } from './rendering/light.js';
+import { ShadowMap } from './rendering/shadow-map.js';
 import { createSceneObject } from './rendering/scene-object.js';
 import vertexShaderSource from './shaders/vertex.glsl';
 import fragmentShaderSource from './shaders/fragment.glsl';
+import shadowVertexShaderSource from './shaders/shadow-vertex.glsl';
+import shadowFragmentShaderSource from './shaders/shadow-fragment.glsl';
 
 inject({
   debug: import.meta.env.DEV,
@@ -63,7 +66,12 @@ async function main() {
 
   const shaderProgram = initShaderProgram(gl, vertexShaderSource, fragmentShaderSource);
   const programInfo = setupProgramInfo(gl, shaderProgram);
-  
+
+  const shadowProgram = initShaderProgram(gl, shadowVertexShaderSource, shadowFragmentShaderSource);
+  const shadowProgramInfo = setupShadowProgramInfo(gl, shadowProgram);
+
+  const shadowMap = new ShadowMap(gl, gl.canvas.clientWidth, gl.canvas.clientHeight);
+
   const camera = new Camera(
     vec3.fromValues(0, 0, 5),
     vec3.fromValues(0, 0, -1),
@@ -85,14 +93,14 @@ async function main() {
   const light = new ConeLight(
     vec3.add(vec3.create(), camera.position, vec3.fromValues(1.0, -1.0, -1.0)),
     camera.target,
-    0.25,
-    0.4,
+    3.1415/18.0, // 10 degrees
+    3.1415/4.5, // 40 degrees
     40.0,
-    vec3.fromValues(1.0, 1.0, 0.4)
+    vec3.fromValues(1.0, 1.0, 1.0)
   );
   
   const wallObject = await createSceneObject(gl, '/assets/textures/wall', vec3.fromValues(10.0, 10.0, 1.0), vec3.fromValues(0.0, 0.0, 0.0), vec3.fromValues(0.0, 0.0, 0.0));
-  const nameObject = await createSceneObject(gl, '/assets/textures/name', vec3.fromValues(0.2, 0.2, 1.0), vec3.fromValues(0.0, 0.0, 1.0), vec3.fromValues(0.0, 0.0, 0.0));
+  const nameObject = await createSceneObject(gl, '/assets/textures/name', vec3.fromValues(0.4, 0.4, 1.0), vec3.fromValues(0.0, 0.0, 0.2), vec3.fromValues(0.0, 0.0, 0.0));
   const objects = [wallObject, nameObject];
 
   let lastTime = 0;
@@ -109,7 +117,7 @@ async function main() {
     const newLightTarget = calculateLightDirection(cursorPosition, camera);
     light.setTarget(newLightTarget[0], newLightTarget[1], newLightTarget[2]);
 
-    drawScene(gl, programInfo, objects, camera, light);
+    drawScene(gl, programInfo, shadowProgramInfo, shadowMap, objects, camera, light);
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
