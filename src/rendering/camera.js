@@ -1,10 +1,10 @@
 import { mat4, vec3 } from 'gl-matrix';
 
 export class Camera {
-  constructor(position, target, up, fov, aspect) {
-    this._position = vec3.fromValues(position[0], position[1], position[2]);
-    this._target = vec3.fromValues(target[0], target[1], target[2]);
-    this._up = vec3.fromValues(up[0], up[1], up[2]);
+  constructor(position, target, up, fov, aspect, tiltSensitivity = 0.4, baseTarget = vec3.fromValues(0, 0, -1)) {
+    this._position = position;
+    this._target = target;
+    this._up = up;
     this._fov = fov * Math.PI / 180;
     this._aspect = aspect;
     this.near = 0.1;
@@ -13,7 +13,9 @@ export class Camera {
     this._viewMatrix = mat4.create();
     this._projectionMatrix = mat4.create();
     this._viewProjectionMatrix = mat4.create();
-    
+    this._tiltSensitivity = tiltSensitivity;
+    this._baseTarget = baseTarget;
+
     this.updateMatrices();
   }
   
@@ -50,6 +52,14 @@ export class Camera {
   set aspect(value) {
     this._aspect = value;
     this.updateMatrices();
+  }
+
+  get tiltSensitivity() {
+    return this._tiltSensitivity;
+  }
+
+  get baseTarget() {
+    return this._baseTarget;
   }
   
   lookAt(targetX, targetY, targetZ) {

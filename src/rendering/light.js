@@ -1,4 +1,6 @@
-import { vec3 } from 'gl-matrix';
+import { vec3, mat4 } from 'gl-matrix';
+
+const UP = vec3.fromValues(0, 1, 0);
 
 export class ConeLight {
   constructor(position, target, coneAngle, coneSoftness, intensity = 25.0, color = vec3.fromValues(1.0, 1.0, 1.0)) {
@@ -40,5 +42,36 @@ export class ConeLight {
   setTarget(x, y, z) {
     vec3.set(this._target, x, y, z);
     this.updateDirection();
+  }
+
+  getViewProjectionMatrix(near, far) {
+    return this._buildViewProjection(this._position, this._target, near, far);
+  }
+
+  getShadowViewProjectionMatrix(near, far, gridSize = 0.02) {
+    const round = (v, size) => Math.round(v / size) * size;
+    const stablePos = vec3.fromValues(
+      round(this._position[0], gridSize),
+      round(this._position[1], gridSize),
+      round(this._position[2], gridSize),
+    );
+    const stableTarget = vec3.fromValues(
+      round(this._target[0], gridSize),
+      round(this._target[1], gridSize),
+      round(this._target[2], gridSize),
+    );
+    return this._buildViewProjection(stablePos, stableTarget, near, far);
+  }
+
+  _buildViewProjection(eye, center, near, far) {
+    const view = mat4.create();
+    mat4.lookAt(view, eye, center, UP);
+    const outerConeAngle = this._coneAngle + this._coneSoftness;
+    const fov = 2 * outerConeAngle;
+    const projection = mat4.create();
+    mat4.perspective(projection, fov, 1, near, far);
+    const viewProjection = mat4.create();
+    mat4.multiply(viewProjection, projection, view);
+    return viewProjection;
   }
 }
