@@ -19,6 +19,75 @@ import fragmentShaderSource from './shaders/fragment.glsl';
 import shadowVertexShaderSource from './shaders/shadow-vertex.glsl';
 import shadowFragmentShaderSource from './shaders/shadow-fragment.glsl';
 
+function updateObjectLayout(gl, camera, wallObject, nameObject) {
+  if (!wallObject || !nameObject) {
+    return;
+  }
+
+  const canvasWidth = gl.canvas.clientWidth || 1;
+  const canvasHeight = gl.canvas.clientHeight || 1;
+  const aspect = canvasWidth / canvasHeight;
+
+  const marginName = 0.9;
+  const marginWall = 1.02;
+
+  const cameraZ = camera.position[2];
+
+  const wallZ = 0.0;
+  const nameZ = 0.3;
+
+  const distanceToWall = Math.abs(cameraZ - wallZ);
+  const distanceToName = Math.abs(cameraZ - nameZ);
+
+  const halfHeightWall = Math.tan(camera.fov / 2) * distanceToWall;
+  const halfWidthWall = halfHeightWall * aspect;
+
+  const halfHeightName = Math.tan(camera.fov / 2) * distanceToName;
+  const halfWidthName = halfHeightName * aspect;
+
+  const wallAspect = wallObject.geometry.aspectRatio || 1.0;
+  const nameAspect = nameObject.geometry.aspectRatio || 1.0;
+
+  const unitHalfHeight = 0.5;
+
+  const unitHalfWidthWall = wallAspect / 2.0;
+  const minScaleWallHeight = halfHeightWall / unitHalfHeight;
+  const minScaleWallWidth = halfWidthWall / unitHalfWidthWall;
+  const wallScale = marginWall * Math.max(minScaleWallHeight, minScaleWallWidth);
+
+  const unitHalfWidthName = nameAspect / 2.0;
+  const maxScaleNameHeight = (marginName * halfHeightName) / unitHalfHeight;
+  const maxScaleNameWidth = (marginName * halfWidthName) / unitHalfWidthName;
+
+  let targetWidthFraction;
+  if (canvasWidth >= 1024) {
+    targetWidthFraction = 0.5;
+  } else if (canvasWidth >= 768) {
+    targetWidthFraction = 0.65;
+  } else {
+    targetWidthFraction = 0.8;
+  }
+
+  const desiredScaleByWidth =
+    targetWidthFraction * (halfWidthName / unitHalfWidthName);
+
+  const nameScale = Math.min(
+    desiredScaleByWidth,
+    maxScaleNameHeight,
+    maxScaleNameWidth
+  );
+
+  const wallModelMatrix = mat4.create();
+  mat4.translate(wallModelMatrix, wallModelMatrix, vec3.fromValues(0.0, 0.0, wallZ));
+  mat4.scale(wallModelMatrix, wallModelMatrix, vec3.fromValues(wallScale, wallScale, 1.0));
+  wallObject.modelMatrix = wallModelMatrix;
+
+  const nameModelMatrix = mat4.create();
+  mat4.translate(nameModelMatrix, nameModelMatrix, vec3.fromValues(0.0, 0.0, nameZ));
+  mat4.scale(nameModelMatrix, nameModelMatrix, vec3.fromValues(nameScale, nameScale, 1.0));
+  nameObject.modelMatrix = nameModelMatrix;
+}
+
 inject({
   debug: import.meta.env.DEV,
 });
@@ -41,6 +110,10 @@ async function main() {
     return;
   }
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+  let wallObject;
+  let nameObject;
+  const objects = [];
 
   const cursorController = new CursorController({
     strategy: 'lerp',
@@ -87,22 +160,24 @@ async function main() {
     canvas.height = window.innerHeight;
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     camera.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    updateObjectLayout(gl, camera, wallObject, nameObject);
   });
   
   
   const light = new ConeLight(
     vec3.add(vec3.create(), camera.position, vec3.fromValues(1.0, -0.5, -0.5)),
     camera.target,
-    3.1415/18.0, // 10 degrees
-    3.1415/6, // 30 degrees
-    40.0,
-    vec3.fromValues(1.0, 1.0, 1.0)
+    3.1415/12.0, // 10 degrees
+    3.1415/10, // 30 degrees
+    18.0,
+    vec3.fromValues(1.0, 1.0, 0.75)
   );
   
-  const wallObject = await createSceneObject(gl, '/assets/textures/wall', vec3.fromValues(10.0, 10.0, 1.0), vec3.fromValues(0.0, 0.0, 0.0), vec3.fromValues(0.0, 0.0, 0.0));
-  const nameObject = await createSceneObject(gl, '/assets/textures/name', vec3.fromValues(0.5, 0.5, 1.0), vec3.fromValues(0.0, 0.0, 0.3), vec3.fromValues(0.0, 0.0, 0.0));
+  wallObject = await createSceneObject(gl, '/assets/textures/wall', vec3.fromValues(10.0, 10.0, 1.0), vec3.fromValues(0.0, 0.0, 0.0), vec3.fromValues(0.0, 0.0, 0.0));
+  nameObject = await createSceneObject(gl, '/assets/textures/name', vec3.fromValues(0.5, 0.5, 1.0), vec3.fromValues(0.0, 0.0, 0.3), vec3.fromValues(0.0, 0.0, 0.0));
   nameObject.material.metallic = 0.8;
-  const objects = [wallObject, nameObject];
+  objects.push(wallObject, nameObject);
+  updateObjectLayout(gl, camera, wallObject, nameObject);
 
   let lastTime = 0;
   function render(currentTime) {

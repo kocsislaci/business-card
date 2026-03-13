@@ -105,7 +105,7 @@ void main() {
 
     vec3 finalColor = ambient + Lo;
 
-    // finalColor = pow(finalColor, vec3(1.0 / GAMMA));
+    finalColor = pow(finalColor, vec3(1.0 / GAMMA));
 
     gl_FragColor = vec4(finalColor, albedoAlpha);
 }
