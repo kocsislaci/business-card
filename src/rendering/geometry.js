@@ -84,5 +84,7 @@ export function createQuadGeometry(gl, aspectRatio = 1.0, subdivisions = 200) {
     }
   }
 
-  return new Geometry(gl, positions, texCoords, indices, gl.TRIANGLES);
+  const geometry = new Geometry(gl, positions, texCoords, indices, gl.TRIANGLES);
+  geometry.aspectRatio = aspectRatio;
+  return geometry;
 }
