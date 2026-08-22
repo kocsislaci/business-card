@@ -1,22 +1,17 @@
 import { inject } from '@vercel/analytics';
 import { injectSpeedInsights } from '@vercel/speed-insights';
-import { mat4, vec3, vec4 } from 'gl-matrix';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/700.css';
-import '@fontsource/roboto/900.css';
+import { vec3 } from 'gl-matrix';
+import '@fontsource/space-grotesk/300.css';
+import '@fontsource/space-grotesk/400.css';
 
 import { CursorController } from './cursor-controller/controller.js';
 import { handShakeEffect, idleHandEffect } from './cursor-controller/effects.js';
-import { initShaderProgram } from './webgl-utils/shaders.js';
-import { drawScene } from './rendering/renderer.js';
-import { setupProgramInfo } from './rendering/scene.js';
 import { Camera } from './rendering/camera.js';
-import { ConeLight } from './rendering/light.js';
-import { createQuadGeometry } from './rendering/geometry.js';
-import { Material } from './rendering/material.js';
-import { Model } from './rendering/model.js';
-import vertexShaderSource from './shaders/vertex.glsl';
-import fragmentShaderSource from './shaders/fragment.glsl';
+import { config } from './galaxy/config.js';
+import { GalaxySimulation } from './galaxy/simulation.js';
+import { BackgroundRenderer } from './galaxy/background.js';
+import { StarRenderer } from './galaxy/star-renderer.js';
+import { PostProcessor } from './galaxy/postprocess.js';
 
 inject({
   debug: import.meta.env.DEV,
@@ -44,19 +39,21 @@ cursorController.addEffect(idleHandEffect, {
 
 main();
 
-async function main() {
+function main() {
   const canvas = document.querySelector("#canvas");
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  const gl = canvas.getContext("webgl");
+
+  const gl = canvas.getContext("webgl2");
   if (gl === null) {
-    alert(
-      "Unable to initialize WebGL. Your browser or machine may not support it.",
-    );
+    alert("Unable to initialize WebGL2. Your browser or machine may not support it.");
     return;
   }
-
-  const nameElement = document.getElementById('name');
+  // Required to render into the float textures the simulation and HDR pipeline use.
+  if (!gl.getExtension("EXT_color_buffer_float")) {
+    alert("This browser does not support floating-point render targets (EXT_color_buffer_float).");
+    return;
+  }
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -66,61 +63,49 @@ async function main() {
     cursorController.target = { x, y };
   });
 
-  const shaderProgram = initShaderProgram(gl, vertexShaderSource, fragmentShaderSource);
+  // Place the camera on a ring tilted off the disk's face-on axis (+Z), raised
+  // in +Y, so we look down at the galaxy at an angle. tilt 0 = straight down on
+  // the disk, 90 = edge-on.
+  const tilt = config.cameraTilt * Math.PI / 180;
+  const cameraPosition = [
+    0,
+    config.cameraDistance * Math.sin(tilt),
+    config.cameraDistance * Math.cos(tilt),
+  ];
 
-  const programInfo = setupProgramInfo(gl, shaderProgram);
-  
   const camera = new Camera(
-    [0, 0, 5], // position
-    [0, 0, -1], // target
-    [0, 1, 0], // up
+    cameraPosition,
+    [0, 0, 0],   // looking at the galactic core
+    [0, 1, 0],
     45,
     gl.canvas.clientWidth / gl.canvas.clientHeight,
   );
 
+  const simulation = new GalaxySimulation(gl, config);
+  const backgroundRenderer = new BackgroundRenderer(gl, config);
+  const starRenderer = new StarRenderer(gl, config);
+  const postProcessor = new PostProcessor(gl, config, canvas.width, canvas.height);
+
   window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     camera.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    postProcessor.resize(canvas.width, canvas.height);
   });
-  
+
   const cameraTiltSensitivity = 0.4;
-  const baseCameraTarget = vec3.fromValues(0, 0, -1);
-  
-  const light = new ConeLight(
-    vec3.add(vec3.create(), camera.position, vec3.fromValues(1, -1, -1)),
-    camera.target,
-    0.25,
-    0.4,
-    40.0,
-    vec3.fromValues(1.0, 1.0, 0.4)
-  );
-  
-  const material = new Material(gl);
-  const [
-    { aspectRatio },
-  ] = await Promise.all([
-    material.loadAlbedo('/assets/textures/wall-a.webp'),
-    material.loadAmbientOcclusion('/assets/textures/wall-ao.webp'),
-    material.loadNormal('/assets/textures/wall-n.webp'),
-    material.loadRoughness('/assets/textures/wall-r.webp'),
-    material.loadDisplacement('/assets/textures/wall-d.webp'),
-  ]);
-  
-  const geometry = createQuadGeometry(gl, aspectRatio);
-  
-  const model = new Model(geometry, material);
-  model.setScale(10.0, 10.0, 1.0);
+  const baseCameraTarget = vec3.fromValues(0, 0, 0);
 
   let lastTime = 0;
   function render(currentTime) {
-    const deltaTime = lastTime === 0 ? 0 : (currentTime - lastTime) / 1000;
+    const rawDelta = lastTime === 0 ? 0 : (currentTime - lastTime) / 1000;
     lastTime = currentTime;
+    const deltaTime = Math.min(rawDelta, config.maxDeltaTime);
 
     cursorController.update(deltaTime);
     const cursorState = cursorController.position;
 
+    // Cursor-driven camera tilt (the scene moves; the HTML overlay does not).
     const cameraTiltOffset = vec3.fromValues(
       cursorState.x * cameraTiltSensitivity,
       cursorState.y * cameraTiltSensitivity,
@@ -129,33 +114,15 @@ async function main() {
     const newCameraTarget = vec3.create();
     vec3.add(newCameraTarget, baseCameraTarget, cameraTiltOffset);
     camera.lookAt(newCameraTarget[0], newCameraTarget[1], newCameraTarget[2]);
-    
-    const offsetX = -cursorState.x * cameraTiltSensitivity * canvas.width * 0.135;
-    const offsetY = cursorState.y * cameraTiltSensitivity * canvas.height * 0.225;
-    nameElement.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 
-    const viewDirX = cursorState.x * camera.aspect * Math.tan(camera.fov / 2);
-    const viewDirY = cursorState.y * Math.tan(camera.fov / 2);
-    const viewDirZ = -1.0;
-    
-    const invViewMatrix = mat4.create();
-    mat4.invert(invViewMatrix, camera.viewMatrix);
-    
-    const viewDir = vec4.fromValues(viewDirX, viewDirY, viewDirZ, 0.0);
-    const worldDir4 = vec4.create();
-    vec4.transformMat4(worldDir4, viewDir, invViewMatrix);
-    
-    const worldDir = vec3.fromValues(worldDir4[0], worldDir4[1], worldDir4[2]);
-    vec3.normalize(worldDir, worldDir);
-    
-    const cameraPos = camera.position;
-    const t = -cameraPos[2] / worldDir[2];
-    const intersectionPoint = vec3.create();
-    vec3.scaleAndAdd(intersectionPoint, cameraPos, worldDir, t);
-    
-    light.setTarget(intersectionPoint[0], intersectionPoint[1], intersectionPoint[2]);
+    // Advance the GPU N-body simulation, paint the deep-field sky, render the
+    // stars over it into the HDR buffer, then run bloom + tone mapping.
+    simulation.step(deltaTime * config.timeScale);
+    postProcessor.beginScene();
+    backgroundRenderer.render(camera);
+    starRenderer.render(simulation, camera);
+    postProcessor.render();
 
-    drawScene(gl, programInfo, [model], camera, light);
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
