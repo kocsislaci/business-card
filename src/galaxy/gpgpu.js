@@ -1,11 +1,27 @@
 // Small WebGL2 helpers shared by the galaxy simulation, renderer and post FX.
 
-// A high-precision (RGBA32F) texture used to hold simulation state (positions,
-// velocities). Sampled with texelFetch, so filtering is NEAREST.
+// Picks the best color-renderable format for the HDR scene/bloom buffers.
+// Rendering into half-float textures needs EXT_color_buffer_float or
+// EXT_color_buffer_half_float (iOS WebKit only exposes the latter). Without
+// either we fall back to plain RGBA8, which clamps the scene to LDR but keeps
+// the bloom chain and tone mapping working.
+export function detectColorTargetFormat(gl) {
+  if (gl.getExtension('EXT_color_buffer_float') || gl.getExtension('EXT_color_buffer_half_float')) {
+    return { internalFormat: gl.RGBA16F, type: gl.HALF_FLOAT, hdr: true };
+  }
+  return { internalFormat: gl.RGBA8, type: gl.UNSIGNED_BYTE, hdr: false };
+}
+
+// A high-precision texture used to hold simulation state (positions,
+// velocities). Stored as RGBA32UI with the raw IEEE-754 bits of each float:
+// integer textures are color-renderable in core WebGL2, so this works without
+// EXT_color_buffer_float (missing on iOS). Shaders decode with uintBitsToFloat.
+// Sampled with texelFetch, so filtering is NEAREST.
 export function createDataTexture(gl, width, height, data) {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, data);
+  const bits = data ? new Uint32Array(data.buffer, data.byteOffset, data.length) : null;
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32UI, width, height, 0, gl.RGBA_INTEGER, gl.UNSIGNED_INT, bits);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -13,12 +29,13 @@ export function createDataTexture(gl, width, height, data) {
   return texture;
 }
 
-// A filterable half-float (RGBA16F) HDR color texture used for the scene and
-// bloom buffers. LINEAR filtering so the blur passes interpolate smoothly.
-export function createColorTexture(gl, width, height) {
+// A filterable color texture used for the scene and bloom buffers, in the
+// format chosen by detectColorTargetFormat (RGBA16F when available, else
+// RGBA8). LINEAR filtering so the blur passes interpolate smoothly.
+export function createColorTexture(gl, width, height, format) {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.HALF_FLOAT, null);
+  gl.texImage2D(gl.TEXTURE_2D, 0, format.internalFormat, width, height, 0, gl.RGBA, format.type, null);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);

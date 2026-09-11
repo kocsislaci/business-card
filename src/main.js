@@ -49,12 +49,6 @@ function main() {
     alert("Unable to initialize WebGL2. Your browser or machine may not support it.");
     return;
   }
-  // Required to render into the float textures the simulation and HDR pipeline use.
-  if (!gl.getExtension("EXT_color_buffer_float")) {
-    alert("This browser does not support floating-point render targets (EXT_color_buffer_float).");
-    return;
-  }
-
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
   window.addEventListener('pointermove', (event) => {

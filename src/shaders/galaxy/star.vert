@@ -5,7 +5,7 @@ precision highp float;
 // simulation texture via gl_VertexID; color comes from galactocentric radius
 // and each star gets a little random size/brightness so the field isn't sterile.
 
-uniform sampler2D uPosTex;
+uniform highp usampler2D uPosTex; // RGBA32UI, raw float bits (see gpgpu.js)
 uniform int  uTexSize;
 uniform mat4 uViewProjection;
 uniform float uPointSize;
@@ -27,7 +27,7 @@ float hash(float n) {
 void main() {
     int id = gl_VertexID;
     ivec2 coord = ivec2(id % uTexSize, id / uTexSize);
-    vec3 pos = texelFetch(uPosTex, coord, 0).xyz;
+    vec3 pos = uintBitsToFloat(texelFetch(uPosTex, coord, 0).xyz);
 
     vec4 clip = uViewProjection * vec4(pos, 1.0);
     gl_Position = clip;

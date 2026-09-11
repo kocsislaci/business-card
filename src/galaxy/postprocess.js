@@ -1,5 +1,5 @@
 import { initShaderProgram } from '../webgl-utils/shaders.js';
-import { createColorTexture, createFramebuffer, getUniforms, drawFullscreenTriangle } from './gpgpu.js';
+import { createColorTexture, createFramebuffer, detectColorTargetFormat, getUniforms, drawFullscreenTriangle } from './gpgpu.js';
 import fullscreenVert from '../shaders/galaxy/fullscreen.vert';
 import brightpassFrag from '../shaders/galaxy/brightpass.frag';
 import blurFrag from '../shaders/galaxy/blur.frag';
@@ -12,6 +12,8 @@ export class PostProcessor {
   constructor(gl, config, width, height) {
     this.gl = gl;
     this.config = config;
+    // RGBA16F where the browser can render to half-float, RGBA8 otherwise.
+    this.colorFormat = detectColorTargetFormat(gl);
 
     this.brightpassProgram = initShaderProgram(gl, fullscreenVert, brightpassFrag);
     this.brightpassUniforms = getUniforms(gl, this.brightpassProgram, ['uScene', 'uThreshold']);
@@ -37,13 +39,13 @@ export class PostProcessor {
 
     this._deleteTargets();
 
-    this.sceneTexture = createColorTexture(gl, width, height);
+    this.sceneTexture = createColorTexture(gl, width, height, this.colorFormat);
     this.sceneFramebuffer = createFramebuffer(gl, [this.sceneTexture]);
 
     // Two half-res buffers ping-ponged by the bright pass and blur passes.
     this.bloomTextures = [
-      createColorTexture(gl, this.bloomWidth, this.bloomHeight),
-      createColorTexture(gl, this.bloomWidth, this.bloomHeight),
+      createColorTexture(gl, this.bloomWidth, this.bloomHeight, this.colorFormat),
+      createColorTexture(gl, this.bloomWidth, this.bloomHeight, this.colorFormat),
     ];
     this.bloomFramebuffers = [
       createFramebuffer(gl, [this.bloomTextures[0]]),

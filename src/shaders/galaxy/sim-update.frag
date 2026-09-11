@@ -5,8 +5,10 @@ precision highp float;
 // grid; each fragment is one star. Reads the previous position/velocity and
 // writes the new ones via MRT (out 0 = position, out 1 = velocity).
 
-uniform sampler2D uPosTex;   // xyz = position, w = mass
-uniform sampler2D uVelTex;   // xyz = velocity
+// State textures are RGBA32UI holding raw float bits (see gpgpu.js), so they
+// are read as uints and decoded with uintBitsToFloat.
+uniform highp usampler2D uPosTex;   // xyz = position, w = mass
+uniform highp usampler2D uVelTex;   // xyz = velocity
 uniform int   uTexSize;
 uniform float uDt;
 uniform float uCoreStrength;
@@ -15,13 +17,13 @@ uniform float uStarStarStrength;
 uniform float uSoftening;
 uniform float uDamping;
 
-layout(location = 0) out vec4 outPos;
-layout(location = 1) out vec4 outVel;
+layout(location = 0) out uvec4 outPos;
+layout(location = 1) out uvec4 outVel;
 
 void main() {
     ivec2 coord = ivec2(gl_FragCoord.xy);
-    vec4 P = texelFetch(uPosTex, coord, 0);
-    vec4 V = texelFetch(uVelTex, coord, 0);
+    vec4 P = uintBitsToFloat(texelFetch(uPosTex, coord, 0));
+    vec4 V = uintBitsToFloat(texelFetch(uVelTex, coord, 0));
     vec3 pos = P.xyz;
     vec3 vel = V.xyz;
 
@@ -37,7 +39,7 @@ void main() {
     float f = uG * uStarStarStrength;
     for (int y = 0; y < uTexSize; y++) {
         for (int x = 0; x < uTexSize; x++) {
-            vec4 Pj = texelFetch(uPosTex, ivec2(x, y), 0);
+            vec4 Pj = uintBitsToFloat(texelFetch(uPosTex, ivec2(x, y), 0));
             vec3 d = Pj.xyz - pos;
             float r2 = dot(d, d) + soft2;
             acc += f * Pj.w * d / (r2 * sqrt(r2));
@@ -49,6 +51,6 @@ void main() {
     vel *= max(0.0, 1.0 - uDamping * uDt);
     pos += vel * uDt;
 
-    outPos = vec4(pos, P.w);
-    outVel = vec4(vel, 0.0);
+    outPos = floatBitsToUint(vec4(pos, P.w));
+    outVel = floatBitsToUint(vec4(vel, 0.0));
 }
