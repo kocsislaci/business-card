@@ -12,6 +12,7 @@ import { GalaxySimulation } from './galaxy/simulation.js';
 import { BackgroundRenderer } from './galaxy/background.js';
 import { StarRenderer } from './galaxy/star-renderer.js';
 import { PostProcessor } from './galaxy/postprocess.js';
+import { AdaptiveQuality } from './galaxy/adaptive.js';
 
 inject({
   debug: import.meta.env.DEV,
@@ -79,6 +80,7 @@ function main() {
   const backgroundRenderer = new BackgroundRenderer(gl, config);
   const starRenderer = new StarRenderer(gl, config);
   const postProcessor = new PostProcessor(gl, config, canvas.width, canvas.height);
+  const adaptiveQuality = new AdaptiveQuality(config);
 
   window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
@@ -95,6 +97,9 @@ function main() {
     const rawDelta = lastTime === 0 ? 0 : (currentTime - lastTime) / 1000;
     lastTime = currentTime;
     const deltaTime = Math.min(rawDelta, config.maxDeltaTime);
+
+    // Pick the N-body sampling stride from the measured frame time.
+    simulation.sampleStride = adaptiveQuality.update(rawDelta);
 
     cursorController.update(deltaTime);
     const cursorState = cursorController.position;
