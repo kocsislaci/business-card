@@ -28,6 +28,22 @@ export const config = {
   timeScale: 0.01,           // global time multiplier
   maxDeltaTime: 0.033,      // clamp dt (seconds) so a lag spike can't explode the sim
 
+  // -- Adaptive N-body sampling ---------------------------------------------
+  // The star-star pass sums over every sampleStride-th partner (scaled back up
+  // by the stride), so its cost is starCount^2 / stride. The stride is chosen
+  // at runtime from measured frame times: it always starts expensive-safe
+  // (sampleStrideInitial) and only steps down while the frame budget allows,
+  // so a weak GPU never runs the full pass. Must be powers of two.
+  sampleStrideInitial: 8,   // stride every device starts with
+  sampleStrideMin: 1,       // 1 = exact O(N^2) sum
+  sampleStrideMax: 16,
+  adaptiveWindowFrames: 60, // frames averaged per decision
+  adaptiveTargetMs: 14.0,   // avg frame time below this -> try a lower stride
+  adaptiveLimitMs: 20.0,    // avg frame time above this -> step up immediately
+  adaptiveSpikeMs: 33.0,    // any single frame above this counts as a drop
+  adaptiveGoodWindows: 2,   // consecutive good windows needed before stepping down
+  adaptiveSettleSeconds: 10, // stepping down is only allowed this long after start
+
   // -- Initial star disk ----------------------------------------------------
   diskRadius: 6.0,          // outer radius of the initial disk
   innerRadius: 0.4,         // empty hole around the core

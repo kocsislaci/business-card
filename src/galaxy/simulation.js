@@ -29,11 +29,13 @@ export class GalaxySimulation {
     ];
     this.read = 0;
     this.write = 1;
+    this.frame = 0;
+    this.sampleStride = config.sampleStrideInitial;
 
     this.program = initShaderProgram(gl, fullscreenVert, simFrag);
     this.uniforms = getUniforms(gl, this.program, [
       'uPosTex', 'uVelTex', 'uTexSize', 'uDt', 'uCoreStrength', 'uG',
-      'uStarStarStrength', 'uSoftening', 'uDamping',
+      'uStarStarStrength', 'uSoftening', 'uDamping', 'uSampleStride', 'uFrame',
     ]);
     this.vao = gl.createVertexArray();
   }
@@ -65,8 +67,13 @@ export class GalaxySimulation {
     gl.uniform1f(u.uStarStarStrength, c.starStarStrength);
     gl.uniform1f(u.uSoftening, c.softening);
     gl.uniform1f(u.uDamping, c.damping);
+    gl.uniform1i(u.uSampleStride, this.sampleStride);
+    gl.uniform1i(u.uFrame, this.frame);
 
     drawFullscreenTriangle(gl);
+    // Wrap at a multiple of sampleStrideMax so the shader's int never overflows
+    // and the rotating sample offset stays evenly distributed for every stride.
+    this.frame = (this.frame + 1) % (c.sampleStrideMax * 4096);
 
     gl.bindVertexArray(null);
     [this.read, this.write] = [this.write, this.read];
